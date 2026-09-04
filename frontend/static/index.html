@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>モブプロンプト・アリーナ | Mob Prompt Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h1>Mob Prompt Arena</h1>
+          <span class="brand-tag">チーム設計＆モブプロンプト・アリーナ</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <span id="connection-status" class="status-pill online">
+          <span class="status-dot"></span>
+          <span class="status-label">接続中 (SSE)</span>
+        </span>
+        <div class="current-user-card" id="user-profile-trigger">
+          <span class="user-avatar" id="current-user-avatar">👤</span>
+          <div class="user-info">
+            <span class="user-name" id="current-user-name">読み込み中...</span>
+            <span class="user-action">参加者を変更</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="app-body">
+      <!-- Left Sidebar: Members, Badges, Decisions -->
+      <aside class="sidebar">
+        <!-- Section: Active Members -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3>👥 参加メンバー (<span id="member-count">0</span>)</h3>
+          </div>
+          <p class="section-hint">※メンバーをクリックで発言履歴＆バッジ獲得記録を表示</p>
+          <div class="member-list" id="member-list">
+            <div class="empty-state">参加者を待っています...</div>
+          </div>
+        </div>
+
+        <!-- Section: Living Requirements Spec -->
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3>📋 確定した設計書 / 仕様メモ</h3>
+            <span class="badge-count-pill" id="decision-count">0</span>
+          </div>
+          <div class="decisions-list" id="decisions-list">
+            <div class="empty-state">議論が進むと、エージェントが確定した仕様を自動記録します</div>
+          </div>
+        </div>
+
+        <!-- Section: Available Badges (Accordion) -->
+        <details class="sidebar-section accordion-section">
+          <summary class="section-header clickable">
+            <h3>🏅 獲得可能バッジ図鑑</h3>
+            <span class="accordion-arrow">▶</span>
+          </summary>
+          <div class="badge-guide-list" id="badge-guide-list">
+            <!-- Rendered by JS -->
+          </div>
+        </details>
+      </aside>
+
+      <!-- Right Main Chat: Bulletin Board Feed -->
+      <main class="chat-container">
+        <!-- Sticky Active Topic Bar -->
+        <div class="active-topic-bar" id="active-topic-bar">
+          <div class="topic-left">
+            <span class="topic-badge">🔥 議論中</span>
+            <span class="topic-title" id="active-topic-title">システム全体アーキテクチャと基本要件の選定</span>
+          </div>
+          <button class="shutter-toggle-btn" id="shutter-toggle-btn">
+            📋 板書・バックログ (🔒) <span class="shutter-arrow" id="shutter-arrow">▼</span>
+          </button>
+        </div>
+
+        <!-- Drop-down Shutter Panel Drawer -->
+        <div class="shutter-panel" id="shutter-panel">
+          <div class="shutter-header">
+            <h4>📋 チーム板書・バックログ＆確定仕様</h4>
+            <button class="shutter-close-btn" id="shutter-close-btn">▲ 閉じる</button>
+          </div>
+          <div class="shutter-body">
+            <!-- Col 1: Active Topic Detail -->
+            <div class="shutter-card active-card">
+              <div class="shutter-card-title">
+                <span class="card-status-pill burning">🔥 議論中</span>
+                <strong id="shutter-active-title">システム全体アーキテクチャと基本要件の選定</strong>
+              </div>
+              <p class="shutter-card-desc" id="shutter-active-desc">モブプロンプト・アリーナの基本システム構成と主要技術スタックの選定</p>
+            </div>
+
+            <!-- Col 2: Locked Decisions 🔒 -->
+            <div class="shutter-card locked-card">
+              <div class="shutter-card-title">
+                <span class="card-status-pill locked">🔒 確定・ロック済み仕様 (<span id="locked-count">0</span>)</span>
+              </div>
+              <div class="locked-decisions-list" id="locked-decisions-list">
+                <div class="empty-state-sm">確定した仕様はここにロックされて保護されます</div>
+              </div>
+            </div>
+
+            <!-- Col 3: Backlog Items -->
+            <div class="shutter-card backlog-card">
+              <div class="shutter-card-title">
+                <span class="card-status-pill pending">📑 議題バックログ</span>
+              </div>
+              <div class="backlog-items-list" id="backlog-items-list">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+          <!-- Drag & Drop Resize Handle -->
+          <div class="shutter-resize-handle" id="shutter-resize-handle" title="上下にドラッグして高さを調整">
+            <span class="handle-bar"></span>
+          </div>
+        </div>
+
+        <!-- Room Banner -->
+        <div class="room-banner">
+          <span class="banner-icon">📢</span>
+          <div class="banner-text">
+            <strong>全員が同じURLで参加中！</strong>
+            アイデアやアーキテクチャ提案を投稿すると、ファシリテーターがツッコミを入れ、優れた発言にバッジを進呈します。
+          </div>
+        </div>
+
+        <!-- Message Feed -->
+        <div class="chat-feed" id="chat-feed">
+          <!-- Messages will be injected here -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typing-indicator" style="display: none;">
+          <div class="typing-bubble">
+            <span class="typing-avatar">🤖</span>
+            <span class="typing-text">MobPromptFacilitator が思考＆レビュー中...</span>
+            <span class="dots">
+              <span></span><span></span><span></span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <footer class="chat-input-area">
+          <div class="suggestion-chips" id="suggestion-chips">
+            <span class="chip-label">ヒント:</span>
+            <button class="chip" data-text="旅行計画アプリを作りたいです！ユーザーの好みと予算から自動プランニングするアイデアはどう？">💡 旅行アプリのアイデア</button>
+            <button class="chip" data-text="バックエンドは Cloud Run と Firestore のサーバーレス構成にしたいです。運用コストを最小化できると思います。">🏗️ Cloud Run + Firestore 提案</button>
+            <button class="chip" data-text="でも、複数人で同時編集するとき Firestore の書き込み衝突はどう回避するの？そこがリスクになりそう。">🎯 書き込み衝突のリスク指摘</button>
+          </div>
+
+          <form class="input-form" id="chat-form">
+            <div class="sender-label">
+              発言者: <strong id="sender-display-name">Guest</strong>
+            </div>
+            <div class="input-row">
+              <textarea
+                id="message-input"
+                placeholder="モブメンバー全員とエージェントにメッセージを送信... (Enter または 送信ボタン)"
+                rows="2"
+                autocomplete="off"
+              ></textarea>
+              <button type="submit" id="send-button" class="btn-send">
+                <span>送信</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <!-- Member History Modal -->
+  <div class="modal-backdrop" id="history-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="modal-avatar" id="modal-member-avatar">👤</span>
+          <div>
+            <h3 id="modal-member-name">メンバー名</h3>
+            <span class="modal-subtitle" id="modal-member-stats">総発言数: 0 件 | 獲得バッジ: 0 個</span>
+          </div>
+        </div>
+        <button class="btn-close" id="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-badges-row" id="modal-badges-container">
+        <!-- Badges list -->
+      </div>
+
+      <div class="modal-history-content">
+        <h4>💬 発言履歴タイムライン</h4>
+        <p class="modal-note">※バッジを獲得した発言には目印がついています！</p>
+        <div class="history-timeline" id="history-timeline">
+          <!-- Rendered messages -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join/Profile Modal -->
+  <div class="modal-backdrop" id="join-modal" style="display: none;">
+    <div class="modal-card modal-small">
+      <div class="modal-header">
+        <h3>モブプロンプトに参加</h3>
+      </div>
+      <div class="modal-body">
+        <p class="join-description">グループチャット上で表示されるあなたの名前とアバターを選択してください：</p>
+        <div class="form-group">
+          <label for="join-name-input">お名前（ニックネーム）</label>
+          <input type="text" id="join-name-input" placeholder="例: メンバーA, たなか, Architect Ken" maxlength="20" required>
+        </div>
+        <div class="form-group">
+          <label>アバター</label>
+          <div class="avatar-picker" id="avatar-picker">
+            <button type="button" class="avatar-option selected" data-avatar="👨‍💻">👨‍💻</button>
+            <button type="button" class="avatar-option" data-avatar="👩‍💻">👩‍💻</button>
+            <button type="button" class="avatar-option" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-option" data-avatar="🚀">🚀</button>
+            <button type="button" class="avatar-option" data-avatar="🎨">🎨</button>
+            <button type="button" class="avatar-option" data-avatar="🧠">🧠</button>
+            <button type="button" class="avatar-option" data-avatar="⚡">⚡</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" id="join-submit-btn">ルームに参加する</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
