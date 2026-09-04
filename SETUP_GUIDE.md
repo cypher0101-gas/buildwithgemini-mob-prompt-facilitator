@@ -119,14 +119,50 @@ GOOGLE_GENAI_USE_VERTEXAI=true GOOGLE_CLOUD_PROJECT=YOUR_GOOGLE_CLOUD_PROJECT_ID
 - ジェミ助さん: `http://127.0.0.1:8080/?user=ジェミ助`
 - ミニーさん: `http://127.0.0.1:8080/?user=ミニー`
 
-### ☁️ ご自身の GCP アカウントへの Agent Runtime デプロイ
+### ☁️ ご自身の GCP アカウントへの Agent Runtime (Agent) デプロイ
 ```bash
 agents-cli deploy --no-confirm-project --project YOUR_GOOGLE_CLOUD_PROJECT_ID
+```
+
+### 🌐 WebUI サーバーの Cloud Run へのワンクリックデプロイ
+Webアリーナ画面（FastAPI + SSEサーバー）を Cloud Run に公開する場合：
+
+```bash
+gcloud run deploy mob-prompt-arena-ui \
+  --source . \
+  --file Dockerfile.frontend \
+  --region us-east1 \
+  --allow-unauthenticated \
+  --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=YOUR_GOOGLE_CLOUD_PROJECT_ID
+```
+デプロイが成功すると、生成された Cloud Run URL (`https://mob-prompt-arena-ui-xxx-uc.a.run.app`) で世界中どこからでもアリーナに参加できます！
+
+---
+
+## 🏗️ ディレクトリ構成と役割分担 (Agent vs WebApp)
+
+```
+mob-prompt-facilitator/
+├── app/                        # 【Agentコア領域】(Agent Runtime デプロイ対象)
+│   ├── agent.py               #   - エージェントロジック & Tools
+│   ├── state.py               #   - アリーナ共有ステートストア
+│   └── fast_api_app.py        #   - ADK A2A エンドポイント
+├── frontend/                   # 【WebAppフロントエンド領域】(Cloud Run デプロイ対象)
+│   ├── server.py              #   - SSEリアルタイムマルチユーザーWebUIサーバー
+│   └── static/                #   - アリーナ画面 (index.html, style.css, app.js)
+├── Dockerfile                  # Agent Engine / Reasoning Engine 用 Dockerfile
+├── Dockerfile.frontend         # Cloud Run WebUI サーバー用 Dockerfile
+├── SETUP_GUIDE.md             # 本引き継ぎマニュアル
+└── pyproject.toml             # Python 依存関係
 ```
 
 ---
 
 ## 📚 参考ドキュメントリンク
 - [ADK (Agent Development Kit) 公式ドキュメント](https://adk.dev/)
+- [A2A Protocol 仕様・Inspector](https://a2a-protocol.org/)
+- [Google Cloud Vertex AI Agent Engine](https://cloud.google.com/vertex-ai/docs)
+- [Google Cloud Run ドキュメント](https://cloud.google.com/run/docs)
+
 - [A2A Protocol 仕様・Inspector](https://a2a-protocol.org/)
 - [Google Cloud Vertex AI Agent Engine](https://cloud.google.com/vertex-ai/docs)
