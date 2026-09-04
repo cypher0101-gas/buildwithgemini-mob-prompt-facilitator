@@ -1,94 +1,74 @@
-# sample-agent
+# モブプロンプト・アリーナ (Mob Prompt Arena) 🚀
 
-Simple ReAct agent
-Agent generated with `agents-cli` version `1.3.1`
+Google Cloud ADK / Gemini 2.5 活用型・モブプロンプティング体験・ファシリテーションAIエージェント＆リアルタイムWebUI
 
-## Project Structure
+## 📌 概要
 
-```
-sample-agent/
-├── app/         # Core agent code
-│   ├── agent.py               # Main agent logic
-│   ├── fast_api_app.py        # FastAPI Backend server
-│   └── app_utils/             # App utilities and helpers
-├── tests/                     # Unit, integration, and load tests
-├── GEMINI.md                  # AI-assisted development guide
-└── pyproject.toml             # Project dependencies
-```
-
-> 💡 **Tip:** Use [Antigravity CLI](https://antigravity.google/) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
-
-## Requirements
-
-Before you begin, ensure you have:
-- **uv**: Python package manager (used for all dependency management in this project) - [Install](https://docs.astral.sh/uv/getting-started/installation/) ([add packages](https://docs.astral.sh/uv/concepts/dependencies/) with `uv add <package>`)
-- **agents-cli**: Agents CLI - Install with `uv tool install google-agents-cli`
-- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
-
-
-## Quick Start
-
-Install `agents-cli` and its skills if not already installed:
-
-```bash
-uvx google-agents-cli setup
-```
-
-Install required packages:
-
-```bash
-agents-cli install
-```
-
-Test the agent with a local web server:
-
-```bash
-agents-cli playground
-```
-
-You can also use features from the [ADK](https://adk.dev/) CLI with `uv run adk`.
-
-## Commands
-
-| Command              | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `agents-cli install` | Install dependencies using uv                                                         |
-| `agents-cli playground` | Launch local development environment                                                  |
-| `agents-cli lint`    | Run code quality checks                                                               |
-| `agents-cli eval`    | Evaluate agent behavior (generate, grade, analyze, and more — see `agents-cli eval --help`) |
-| `uv run pytest tests/unit tests/integration` | Run unit and integration tests                                                        |
-| `agents-cli deploy`  | Deploy agent to Agent Runtime                                                                |
-| `agents-cli publish gemini-enterprise` | Register deployed agent to Gemini Enterprise                    || [A2A Inspector](https://github.com/a2aproject/a2a-inspector) | Launch A2A Protocol Inspector                                                        |
-
-## 🛠️ Project Management
-
-| Command | What It Does |
-|---------|--------------|
-| `agents-cli scaffold enhance` | Add CI/CD pipelines and Terraform infrastructure |
-| `agents-cli infra cicd` | One-command setup of entire CI/CD pipeline + infrastructure |
-| `agents-cli scaffold upgrade` | Auto-upgrade to latest version while preserving customizations |
+「モブプロンプト・アリーナ」は、複数人の参加者が同じWebチャットルーム（アリーナ）に集まり、プロンプトの工夫やアイデア出しをしながら対話を行うリアルタイム共有空間です。
+ファシリテーターAIエージェントが各メンバーの発言やアイデアの質をリアルタイムにレビューし、的確なツッコミや深掘り質問（Grill Time）、バッジ進呈（ノウハウ表彰）、決定事項のロック保存および議題バックログの管理を行います。
 
 ---
 
-## Development
+## 🛠️ 主な機能
 
-Edit your agent logic in `app/agent.py` and test with `agents-cli playground` - it auto-reloads on save.
+- 💬 **グループチャット＆マルチタブ参加**: `?user=ジェミ助` や `?user=ミニー` などのURLパラメータで別タブから複数人として同時参加可能。
+- 🏆 **バッジ進呈システム & 図鑑（アコーディオン）**:
+  - `技術知性 (Tech Architect)`
+  - `アイデアモンスター (Idea Monster)`
+  - `クリティカルシンカー (Critical Thinker)`
+  - `仕様ドッキング (Spec Finisher)`
+  - `アリーナMVP (Arena MVP)`
+- 📜 **メンバー発言履歴 & バッジ記録モーダル**: メンバーの過去の発言や、どの発言でバッジを獲得したかを追跡。
+- 📌 **板書・バックログ（シャッタードロワー）**:
+  - 画面上部から開閉するシャッター式ドロワー。
+  - 下辺の中央グリップバーをドラッグ＆ドロップして、高さを自由に縦伸縮調整可能。
+  - 議論中テーマ、確定仕様（🔒 南京錠マーク付き）、議題バックログ（「🚀 引き出して議論開始」ボタン付き）を自動同期。
+- 🗣️ **エージェント吹き出しの分離**:
+  - 💬 **フィードバック＆レビュー**（メンバーの発言に対する技術コメントやアイデア評価）
+  - 🔥 **Grill Time**（議題を確定させるための深掘り質問・トレードオフ提示）
 
-## Deployment
+---
 
-```bash
-gcloud config set project <your-project-id>
-agents-cli deploy
+## 📁 フォルダ構成
+
+```
+mob-prompt-facilitator/
+├── app/                        # エージェントコアロジック
+│   ├── agent.py               # ファシリテーターAgent定義・Tools (award_badge, set_active_topic)
+│   ├── state.py               # リアルタイム状態管理 (BoardStore, SSE Broadcast)
+│   └── fast_api_app.py        # ADK API & A2A エンドポイント
+├── frontend/                   # カスタムWebUIサーバー
+│   ├── server.py              # SSEマルチユーザー同期対応 FastAPI サーバー
+│   └── static/                # WebUI アセット (index.html, style.css, app.js)
+├── project_brief.md           # 要件定義書・プロジェクトブリーフ
+├── implementation_plan.md     # アーキテクチャ詳細設計書
+├── walkthrough.md             # 実装・検証成果まとめ
+└── pyproject.toml             # 依存関係定義
 ```
 
-To add CI/CD and Terraform, run `agents-cli scaffold enhance`.
-To set up your production infrastructure, run `agents-cli infra cicd`.
+---
 
-## Observability
+## 🚀 ローカルでの起動方法
 
-Built-in telemetry exports to Cloud Trace, BigQuery, and Cloud Logging.
+依存関係のインストール：
+```bash
+uv sync
+```
 
-## A2A Inspector
+WebUI サーバーの起動：
+```bash
+GOOGLE_GENAI_USE_VERTEXAI=true GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID> uv run python frontend/server.py
+```
 
-This agent supports the [A2A Protocol](https://a2a-protocol.org/). Use the [A2A Inspector](https://github.com/a2aproject/a2a-inspector) to test interoperability.
-See the [A2A Inspector docs](https://github.com/a2aproject/a2a-inspector) for details.
+ブラウザでアクセス：
+- ジェミ助さんでアクセス: `http://127.0.0.1:8080/?user=ジェミ助`
+- ミニーさんでアクセス: `http://127.0.0.1:8080/?user=ミニー`
+
+---
+
+## ☁️ デプロイ (Agent Platform)
+
+エージェントの Agent Runtime へのデプロイ：
+```bash
+agents-cli deploy --no-confirm-project --project <YOUR_PROJECT_ID>
+```
