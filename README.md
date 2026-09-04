@@ -62,7 +62,16 @@ GOOGLE_GENAI_USE_VERTEXAI=true GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID> uv run pyt
 
 ブラウザでアクセス：
 - ジェミ助さんでアクセス: `http://127.0.0.1:8080/?user=ジェミ助`
-- ミニーさんでアクセス: `http://127.0.0.1:8080/?user=ミニー`
+---
+
+## 📚 ドキュメント一覧 (Documentation)
+
+プロジェクトの企画・設計・検証・引き継ぎに関するドキュメントは、すべてリポジトリ直下に配備されています：
+
+- 📄 **[`project_brief.md`](./project_brief.md)**: プロジェクト概要・仕様要件定義書（日本語）
+- 📐 **[`implementation_plan.md`](./implementation_plan.md)**: アーキテクチャ・詳細設計書・ツール設計
+- ✅ **[`walkthrough.md`](./walkthrough.md)**: 実装成果・動作検証結果まとめ（ウォークスルー）
+- 🛠️ **[`SETUP_GUIDE.md`](./SETUP_GUIDE.md)**: 個人のローカル/AGY環境への引き継ぎ＆初期セットアップガイド
 
 ---
 
