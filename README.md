@@ -66,9 +66,24 @@ GOOGLE_GENAI_USE_VERTEXAI=true GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID> uv run pyt
 
 ---
 
-## ☁️ デプロイ (Agent Platform)
+## ☁️ デプロイ (Agent Platform & Cloud Run)
 
-エージェントの Agent Runtime へのデプロイ：
+### 1. エージェントの Agent Runtime へのデプロイ
 ```bash
 agents-cli deploy --no-confirm-project --project <YOUR_PROJECT_ID>
 ```
+
+### 2. WebUI サーバーの Cloud Run へのデプロイ
+```bash
+gcloud run deploy mob-prompt-arena-ui \
+  --source . \
+  --file Dockerfile.frontend \
+  --region us-east1 \
+  --allow-unauthenticated \
+  --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=true,GOOGLE_CLOUD_PROJECT=<YOUR_PROJECT_ID>
+```
+
+---
+
+## 🛠️ セットアップ＆引き継ぎガイド
+詳細な開発環境構築手順、MCP設定、環境変数は [`SETUP_GUIDE.md`](./SETUP_GUIDE.md) をご覧ください。
